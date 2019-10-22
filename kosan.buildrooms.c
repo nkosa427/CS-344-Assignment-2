@@ -13,5 +13,7 @@ int main()
 
 	printf("entered: %s\n", str);
 
+	getpid();
+
 	return 0;
 }
