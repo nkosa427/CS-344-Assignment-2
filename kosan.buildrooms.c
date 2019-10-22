@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/types.h>
-#include <sys/stats.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 int main()
 {
