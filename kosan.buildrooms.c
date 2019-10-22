@@ -7,15 +7,24 @@
 int main()
 {
 	printf("hello world\n");
-	char str[100];
+	char *folderstart = "kosan.rooms.";
+	char strbuffer[40];
+	char folername[70];
+	int p = getpid();
+
+	sprintf(strbuffer, "kosan.rooms.%d", p);
+
+	printf("%s\n", strbuffer);
 
 	// scanf("%s", str);
 
 	// printf("entered: %s\n", str);
 
-	int p = getpid();
+	
 
 	printf("pid: %d\n", p);
+
+	mkdir(strbuffer, 0700);
 
 	return 0;
 }
