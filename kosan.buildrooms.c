@@ -9,11 +9,13 @@ int main()
 	printf("hello world\n");
 	char str[100];
 
-	scanf("%s", str);
+	// scanf("%s", str);
 
-	printf("entered: %s\n", str);
+	// printf("entered: %s\n", str);
 
-	getpid();
+	int p = getpid();
+
+	printf("%d\n", p);
 
 	return 0;
 }
