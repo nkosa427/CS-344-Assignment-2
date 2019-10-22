@@ -6,15 +6,11 @@
 
 int main()
 {
-	printf("hello world\n");
-	char *folderstart = "kosan.rooms.";
-	char strbuffer[40];
-	char folername[70];
+	char foldername[30];
 	int p = getpid();
+	sprintf(foldername, "kosan.rooms.%d", getpid());
 
-	sprintf(strbuffer, "kosan.rooms.%d", p);
-
-	printf("%s\n", strbuffer);
+	printf("%s\n", foldername);
 
 	// scanf("%s", str);
 
@@ -24,7 +20,7 @@ int main()
 
 	printf("pid: %d\n", p);
 
-	mkdir(strbuffer, 0700);
+	mkdir(foldername, 0700);
 
 	return 0;
 }
