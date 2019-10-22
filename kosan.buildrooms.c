@@ -15,7 +15,7 @@ int main()
 
 	int p = getpid();
 
-	printf("%d\n", p);
+	printf("pid: %d\n", p);
 
 	return 0;
 }
