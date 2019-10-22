@@ -1,6 +1,6 @@
 CC=gcc
 
-all: r c clean
+all: r c
 
 r:
 	$(CC) kosan.buildrooms.c -o a
