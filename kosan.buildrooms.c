@@ -25,7 +25,7 @@ int main()
 	struct room *array;
 	array = (struct room*) malloc(7 * sizeof(struct room));
 
-	array[0].name = "hello";
+	strcpy(array[0].name, "hello");
 	printf("name: %s\n", array[0].name);
 
 
