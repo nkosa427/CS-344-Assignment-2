@@ -9,9 +9,19 @@
 struct room{
 	char name[9];
 	char type[11];
-	int numconnections;
+	int cons;
 	struct room *connections;
 };
+
+void add_connection(struct room *array, int i){
+
+}
+
+void make_graph(struct room *array, int i, int rnum){
+	while(array[i].cons < rnum){
+		add_connection(array, i);
+	}
+}
 
 void create_rooms(struct room *array, char namearray[10][9]){
 	int i, rnum;
@@ -30,9 +40,15 @@ void create_rooms(struct room *array, char namearray[10][9]){
 			strcpy(array[i].type, "END_ROOM");
 		}else if(i == 6){
 			strcpy(array[i].type, "START_ROOM");
-		}else
+		}else{
 			strcpy(array[i].type, "MID_ROOM");
-			
+		}
+
+		rnum = rand() % 4 + 3;
+		array[i].cons = rnum;
+
+		make_graph(array, i, rnum);	
+
 	}
 
 }
@@ -69,9 +85,9 @@ int main()
 
 	create_rooms(array, namearray);
 
-	for(i = 0; i < 7; i++){
-		printf("name: %s\tType: %s\n", array[i].name, array[i].type);
-	}
+	// for(i = 0; i < 7; i++){
+	// 	printf("name: %s\tType: %s\n", array[i].name, array[i].type);
+	// }
 
 
 	// scanf("%s", str);
