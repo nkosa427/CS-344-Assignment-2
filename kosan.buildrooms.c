@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -12,25 +13,21 @@ struct room{
 	struct room *connections;
 };
 
-void create_rooms(struct room **array, char namearray[10][9]){
+void create_rooms(struct room *array, char namearray[10][9]){
 	int i, rnum;
 
-	// printf("names:%s\n", namearray[2]);
+	srand(time(NULL));
 		
 	for(i = 0; i < 7; i++){
 		do{
 			rnum = rand() % 10;
-		}while(namearray[rnum] == "NULL");
+		}while(strcmp(namearray[rnum], "NULL") == 0);
 		
-		// strcpy(array[i]->name, "namehere");
-		// strcpy(namearray[rnum], "NULL");
-	
-		// strcpy(array[1]->name, "name");
-		printf("name: %s\n", array[0]->name);
-		// array[0]->type = 1;
+		strcpy(array[i].name, namearray[rnum]);
+		strcpy(namearray[rnum], "NULL");
 	}
 
-	// printf("type: %d\n", array[0]->type);
+
 }
 
 int main()
@@ -42,26 +39,25 @@ int main()
 
 	char namearray[10][9]={
 		"Batcave",
-		"Room 101",
+		"OSU",
 		"Holodeck",
 		"Narnia",
 		"Hobbiton",
 		"Tatooine",
-		"The John",
+		"TheJohn",
 		"McDolans",
 		"Walmart",
-		"Muh Room"
+		"MuhRoom"
 	};
 
 	struct room *array;
 	array = (struct room*) malloc(7 * sizeof(struct room));
 
-	strcpy(array[0].name, "yoyoyo");
-	create_rooms(&array, namearray);
+	create_rooms(array, namearray);
 
-	// for(i = 0; i < 7; i++){
-	// 	printf("name: %s\n", array[i].name);
-	// }
+	for(i = 0; i < 7; i++){
+		printf("name: %s\n", array[i].name);
+	}
 
 
 	// scanf("%s", str);
