@@ -8,7 +8,7 @@
 
 struct room{
 	char name[9];
-	int type;
+	char type[11];
 	int numconnections;
 	struct room *connections;
 };
@@ -22,13 +22,27 @@ void create_rooms(struct room *array, char namearray[10][9]){
 		do{
 			rnum = rand() % 10;
 		}while(strcmp(namearray[rnum], "NULL") == 0);
-		
+
 		strcpy(array[i].name, namearray[rnum]);
 		strcpy(namearray[rnum], "NULL");
+
+		if(i == 0){
+			strcpy(array[i].type, "END_ROOM");
+		}else if(i == 6){
+			strcpy(array[i].type, "START_ROOM");
+		}else
+			strcpy(array[i].type, "MID_ROOM");
+			
 	}
 
-
 }
+
+// void free_struct_array(struct room *array){
+// 	int i;
+// 	for(i = 0; i < 7; i++){
+// 		free(array[i]);
+// 	}
+// }
 
 int main()
 {
@@ -56,7 +70,7 @@ int main()
 	create_rooms(array, namearray);
 
 	for(i = 0; i < 7; i++){
-		printf("name: %s\n", array[i].name);
+		printf("name: %s\tType: %s\n", array[i].name, array[i].type);
 	}
 
 
@@ -69,6 +83,9 @@ int main()
 	printf("pid: %d\n", p);
 
 	// mkdir(foldername, 0700);
+
+	// free_struct_array(array);
+	free(array);
 
 	return 0;
 }
