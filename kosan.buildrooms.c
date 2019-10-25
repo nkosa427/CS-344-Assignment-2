@@ -12,9 +12,9 @@ struct room{
 	struct room *connections;
 };
 
-struct room* create_rooms(char namearray[10][9]){
+void create_rooms(struct room **array, char namearray[10][9]){
 	int i, rnum;
-	struct room* RP = malloc(sizeof(room));
+
 	// printf("names:%s\n", namearray[2]);
 		
 	for(i = 0; i < 7; i++){
@@ -26,11 +26,9 @@ struct room* create_rooms(char namearray[10][9]){
 		// strcpy(namearray[rnum], "NULL");
 	
 		// strcpy(array[1]->name, "name");
-		// printf("name: %s\n", array[0]->name);
+		printf("name: %s\n", array[0]->name);
 		// array[0]->type = 1;
 	}
-
-	return RP;
 
 	// printf("type: %d\n", array[0]->type);
 }
@@ -56,10 +54,10 @@ int main()
 	};
 
 	struct room *array;
-	array = create_rooms(namearray);
+	array = (struct room*) malloc(7 * sizeof(struct room));
 
-	// strcpy(array[0].name, "yoyoyo");
-	// create_rooms(&array, namearray);
+	strcpy(array[0].name, "yoyoyo");
+	create_rooms(&array, namearray);
 
 	// for(i = 0; i < 7; i++){
 	// 	printf("name: %s\n", array[i].name);
