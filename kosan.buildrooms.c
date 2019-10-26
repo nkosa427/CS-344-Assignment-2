@@ -10,7 +10,7 @@ struct room{
 	char name[9];
 	char type[11];
 	int cons;
-	struct room *connections;
+	int connections[7];
 };
 
 void add_connection(struct room *array, int i){
