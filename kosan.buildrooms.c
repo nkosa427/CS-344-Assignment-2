@@ -14,6 +14,27 @@ struct room{
 	int connections[7];
 };
 
+void create_files(struct room *array, char *foldername){
+	int i;
+	for(i = 0; i < 7; i++){
+		char file[30];
+		strcpy(file, foldername);
+		strcat(file, "/");
+		strcat(file, array[i].name);
+		strcat(file, "_room");
+
+		int file_descriptor;
+		file_descriptor = open(file, O_RDWR | O_CREAT, 0600);
+
+		close(file_descriptor);
+	}
+
+	
+	
+	
+
+}
+
 void print_rooms(struct room *array){
 	int i, j;
 
@@ -87,7 +108,7 @@ void create_rooms(struct room *array, char namearray[10][9]){
 int main()
 {
 	int i;
-	char foldername[30];
+	char foldername[30] = "kosan.rooms.";
 	int p = getpid();
 	sprintf(foldername, "kosan.rooms.%d", getpid());
 
@@ -111,12 +132,11 @@ int main()
 
 	print_rooms(array);
 
-	printf("pid: %d\n", p);
+	// printf("pid: %d\n", p);
 
-	// mkdir(foldername, 0700);
+	mkdir(foldername, 0700);
 
-	char file[] = "FILEEE";
-	int file_descriptor;
+	create_files(array, foldername);
 
 	free(array);
 
