@@ -13,6 +13,22 @@ struct room{
 	int connections[7];
 };
 
+void print_rooms(struct room *array){
+	int i, j;
+
+	for(i = 0; i < 7; i++){
+		printf("ROOM NAME: %s\n", array[i].name);
+		int connCount = 0;
+		for(j = 0; j < 7; j++){
+			if(array[i].connections[j] == 1){
+				printf("Connection %d: %s\n", connCount, array[j].name);
+				connCount += 1;
+			}
+		}
+		printf("ROOM TYPE: %s\n\n", array[i].type);
+	}
+}
+
 void add_connection(struct room *array, int current){
 	int RandCon;
 	do{
@@ -62,7 +78,7 @@ void create_rooms(struct room *array, char namearray[10][9]){
 
 	for (i = 0; i < 7; i++){
 		rnum = rand() % 4 + 3;
-		printf("cons to make: %d\n", rnum);
+		// printf("cons to make: %d\n", rnum);
 
 		make_graph(array, i, rnum);
 	}
@@ -101,15 +117,17 @@ int main()
 
 	create_rooms(array, namearray);
 
-	int j;
-	for(i = 0; i < 7; i++){
-		// printf("Connections for array %d\n", i+1);
-		printf("\n");
-		for(j = 0; j < 7; j++){
-			printf("%d\t", array[i].connections[j]);
-		}
-		printf("\n");
-	}
+	// int j;
+	// for(i = 0; i < 7; i++){
+	// 	// printf("Connections for array %d\n", i+1);
+	// 	printf("\n");
+	// 	for(j = 0; j < 7; j++){
+	// 		printf("%d\t", array[i].connections[j]);
+	// 	}
+	// 	printf("\n");
+	// }
+
+	print_rooms(array);
 
 	// for(i = 0; i < 7; i++){
 	// 	printf("name: %s\tType: %s\n", array[i].name, array[i].type);
