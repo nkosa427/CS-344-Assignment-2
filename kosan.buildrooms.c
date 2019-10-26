@@ -4,6 +4,7 @@
 #include <time.h>
 #include <fcntl.h>
 
+
 struct room{
 	char name[9];
 	char type[11];
@@ -44,8 +45,6 @@ void create_files(struct room *array, char *foldername){
 		}
 
 		print_to_file(array, i, file);
-
-		// fprintf(file, "%s", "test");
 
 		fclose(file);
 	}
@@ -148,8 +147,6 @@ int main()
 	create_rooms(array, namearray);
 
 	print_rooms(array);
-
-	// printf("pid: %d\n", p);
 
 	mkdir(foldername, 0700);
 
