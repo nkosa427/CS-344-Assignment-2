@@ -14,12 +14,13 @@ struct room{
 };
 
 void add_connection(struct room *array, int i){
-
+	printf("adding connection\n");
 }
 
 void make_graph(struct room *array, int i, int rnum){
 	while(array[i].cons < rnum){
 		add_connection(array, i);
+		array[i].cons += 1;
 	}
 }
 
@@ -42,13 +43,16 @@ void create_rooms(struct room *array, char namearray[10][9]){
 			strcpy(array[i].type, "START_ROOM");
 		}else{
 			strcpy(array[i].type, "MID_ROOM");
-		}
+		}	
 
+		array[i].cons = 0;
+	}
+
+	for (i = 0; i < 7; i++){
 		rnum = rand() % 4 + 3;
-		array[i].cons = rnum;
+		printf("cons to make: %d\n", rnum);
 
-		make_graph(array, i, rnum);	
-
+		make_graph(array, i, rnum);
 	}
 
 }
