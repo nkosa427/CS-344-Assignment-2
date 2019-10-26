@@ -2,9 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
+#include <fcntl.h>
+
 
 struct room{
 	char name[9];
@@ -12,6 +11,45 @@ struct room{
 	int cons;
 	int connections[7];
 };
+
+void print_to_file(struct room *array, int i, FILE *file){
+	fprintf(file, "ROOM NAME: %s\n", array[i].name);
+	int connCount = 1;
+	int j;
+
+	for(j = 0; j < 7; j++){
+		if(array[i].connections[j] == 1){
+			fprintf(file, "CONNECTION %d: %s\n", connCount, array[j].name);
+			connCount += 1;
+		}
+	}
+
+	fprintf(file, "ROOM TYPE: %s\n", array[i].type);
+}
+
+void create_files(struct room *array, char *foldername){
+	int i;
+	for(i = 0; i < 7; i++){
+		char filepath[30];
+		strcpy(filepath, foldername);
+		strcat(filepath, "/");
+		strcat(filepath, array[i].name);
+		strcat(filepath, "_room");
+
+		FILE *file;
+		file = fopen(filepath, "w+");
+
+		if(file == NULL){
+			printf("File could not be created\n");
+			exit(1);
+		}
+
+		print_to_file(array, i, file);
+
+		fclose(file);
+	}
+
+}
 
 void print_rooms(struct room *array){
 	int i, j;
@@ -78,24 +116,15 @@ void create_rooms(struct room *array, char namearray[10][9]){
 
 	for (i = 0; i < 7; i++){
 		rnum = rand() % 4 + 3;
-		// printf("cons to make: %d\n", rnum);
-
 		make_graph(array, i, rnum);
 	}
 
 }
 
-// void free_struct_array(struct room *array){
-// 	int i;
-// 	for(i = 0; i < 7; i++){
-// 		free(array[i]);
-// 	}
-// }
-
 int main()
 {
 	int i;
-	char foldername[30];
+	char foldername[30] = "kosan.rooms.";
 	int p = getpid();
 	sprintf(foldername, "kosan.rooms.%d", getpid());
 
@@ -117,34 +146,12 @@ int main()
 
 	create_rooms(array, namearray);
 
-	// int j;
-	// for(i = 0; i < 7; i++){
-	// 	// printf("Connections for array %d\n", i+1);
-	// 	printf("\n");
-	// 	for(j = 0; j < 7; j++){
-	// 		printf("%d\t", array[i].connections[j]);
-	// 	}
-	// 	printf("\n");
-	// }
-
 	print_rooms(array);
 
-	// for(i = 0; i < 7; i++){
-	// 	printf("name: %s\tType: %s\n", array[i].name, array[i].type);
-	// }
+	mkdir(foldername, 0700);
 
+	create_files(array, foldername);
 
-	// scanf("%s", str);
-
-	// printf("entered: %s\n", str);
-
-	
-
-	printf("pid: %d\n", p);
-
-	// mkdir(foldername, 0700);
-
-	// free_struct_array(array);
 	free(array);
 
 	return 0;
