@@ -18,10 +18,10 @@ void print_rooms(struct room *array){
 
 	for(i = 0; i < 7; i++){
 		printf("ROOM NAME: %s\n", array[i].name);
-		int connCount = 0;
+		int connCount = 1;
 		for(j = 0; j < 7; j++){
 			if(array[i].connections[j] == 1){
-				printf("Connection %d: %s\n", connCount, array[j].name);
+				printf("CONNECTION %d: %s\n", connCount, array[j].name);
 				connCount += 1;
 			}
 		}
@@ -62,9 +62,9 @@ void create_rooms(struct room *array, char namearray[10][9]){
 		strcpy(namearray[rnum], "NULL");
 
 		if(i == 0){
-			strcpy(array[i].type, "END_ROOM");
-		}else if(i == 6){
 			strcpy(array[i].type, "START_ROOM");
+		}else if(i == 6){
+			strcpy(array[i].type, "END_ROOM");
 		}else{
 			strcpy(array[i].type, "MID_ROOM");
 		}	
