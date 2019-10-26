@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -78,19 +79,10 @@ void create_rooms(struct room *array, char namearray[10][9]){
 
 	for (i = 0; i < 7; i++){
 		rnum = rand() % 4 + 3;
-		// printf("cons to make: %d\n", rnum);
-
 		make_graph(array, i, rnum);
 	}
 
 }
-
-// void free_struct_array(struct room *array){
-// 	int i;
-// 	for(i = 0; i < 7; i++){
-// 		free(array[i]);
-// 	}
-// }
 
 int main()
 {
@@ -117,34 +109,15 @@ int main()
 
 	create_rooms(array, namearray);
 
-	// int j;
-	// for(i = 0; i < 7; i++){
-	// 	// printf("Connections for array %d\n", i+1);
-	// 	printf("\n");
-	// 	for(j = 0; j < 7; j++){
-	// 		printf("%d\t", array[i].connections[j]);
-	// 	}
-	// 	printf("\n");
-	// }
-
 	print_rooms(array);
-
-	// for(i = 0; i < 7; i++){
-	// 	printf("name: %s\tType: %s\n", array[i].name, array[i].type);
-	// }
-
-
-	// scanf("%s", str);
-
-	// printf("entered: %s\n", str);
-
-	
 
 	printf("pid: %d\n", p);
 
 	// mkdir(foldername, 0700);
 
-	// free_struct_array(array);
+	char file[] = "FILEEE";
+	int file_descriptor;
+
 	free(array);
 
 	return 0;
