@@ -14,24 +14,44 @@ struct room{
 	int connections[7];
 };
 
+void print_to_file(struct room *array, int i, FILE *file){
+	fprintf(file, "ROOM NAME: %s\n", array[i].name);
+	int connCount = 1;
+	int j;
+
+	for(j = 0; j < 7; j++){
+		if(array[i].connections[j] == 1){
+			fprintf(file, "CONNECTION %d: %s\n", connCount, array[j].name);
+			connCount += 1;
+		}
+	}
+
+	fprintf(file, "ROOM TYPE: %s\n", array[i].type);
+}
+
 void create_files(struct room *array, char *foldername){
 	int i;
 	for(i = 0; i < 7; i++){
-		char file[30];
-		strcpy(file, foldername);
-		strcat(file, "/");
-		strcat(file, array[i].name);
-		strcat(file, "_room");
+		char filepath[30];
+		strcpy(filepath, foldername);
+		strcat(filepath, "/");
+		strcat(filepath, array[i].name);
+		strcat(filepath, "_room");
 
-		int file_descriptor;
-		file_descriptor = open(file, O_RDWR | O_CREAT, 0600);
+		FILE *file;
+		file = fopen(filepath, "w+");
 
-		close(file_descriptor);
+		if(file == NULL){
+			printf("File could not be created\n");
+			exit(1);
+		}
+
+		print_to_file(array, i, file);
+
+		// fprintf(file, "%s", "test");
+
+		fclose(file);
 	}
-
-	
-	
-	
 
 }
 
