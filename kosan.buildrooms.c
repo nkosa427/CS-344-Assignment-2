@@ -13,19 +13,27 @@ struct room{
 	int connections[7];
 };
 
-void add_connection(struct room *array, int i){
-	printf("adding connection\n");
+void add_connection(struct room *array, int current){
+	int RandCon;
+	do{
+		RandCon = rand() % 7;
+	}while(RandCon == current || array[current].connections[RandCon] == 1);
+
+	array[current].connections[RandCon] = 1;
+	array[RandCon].connections[current] = 1;
+	array[current].cons += 1;
+	array[RandCon].cons += 1;
+
 }
 
-void make_graph(struct room *array, int i, int rnum){
-	while(array[i].cons < rnum){
-		add_connection(array, i);
-		array[i].cons += 1;
+void make_graph(struct room *array, int current, int ConsToAdd){
+	while(array[current].cons < ConsToAdd){
+		add_connection(array, current);
 	}
 }
 
 void create_rooms(struct room *array, char namearray[10][9]){
-	int i, rnum;
+	int i, j, rnum;
 
 	srand(time(NULL));
 		
@@ -45,8 +53,12 @@ void create_rooms(struct room *array, char namearray[10][9]){
 			strcpy(array[i].type, "MID_ROOM");
 		}	
 
+		for(j = 0; j < 7; j++){
+			array[i].connections[j] = 0;
+		}
+
 		array[i].cons = 0;
-	}
+	}	
 
 	for (i = 0; i < 7; i++){
 		rnum = rand() % 4 + 3;
@@ -88,6 +100,16 @@ int main()
 	array = (struct room*) malloc(7 * sizeof(struct room));
 
 	create_rooms(array, namearray);
+
+	int j;
+	for(i = 0; i < 7; i++){
+		// printf("Connections for array %d\n", i+1);
+		printf("\n");
+		for(j = 0; j < 7; j++){
+			printf("%d\t", array[i].connections[j]);
+		}
+		printf("\n");
+	}
 
 	// for(i = 0; i < 7; i++){
 	// 	printf("name: %s\tType: %s\n", array[i].name, array[i].type);
