@@ -31,14 +31,14 @@ char* last_dir(){
 			strcpy(name, rdir_Struct->d_name);
 			time = stat_Struct.st_mtime;
 
-			printf("Name: %s\n", name);
-			printf("Time: %d\n", time);
-			printf("\n");
+			// printf("Name: %s\n", name);
+			// printf("Time: %d\n", time);
+			// printf("\n");
 
 			if(time > largest){
 				largest = stat_Struct.st_mtime;
 				strcpy(newest_dir, rdir_Struct->d_name);
-				printf("largest: %s\n", newest_dir);
+				// printf("largest: %s\n", newest_dir);
 			}
 			
 		}
