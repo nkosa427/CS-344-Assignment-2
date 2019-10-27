@@ -6,6 +6,24 @@
 #include <unistd.h>
 #include <dirent.h>
 
+void getFileNames(char* dir, char names[7][14]){
+	struct dirent *rdir_Struct;
+	DIR *directory = opendir(dir);
+	
+	rdir_Struct = readdir(directory);
+	rdir_Struct = readdir(directory);
+
+	int i = 0;
+
+	while(rdir_Struct = readdir(directory)){
+		// printf("%s\n", rdir_Struct->d_name);
+		strcpy(names[i], rdir_Struct->d_name);
+		i++;
+	}
+
+	closedir(directory);
+}
+
 char* last_dir(){
 	struct dirent *rdir_Struct;
 	struct stat stat_Struct;
@@ -37,10 +55,9 @@ char* last_dir(){
 
 			if(time > largest){
 				largest = stat_Struct.st_mtime;
+				// strcpy(newest_dir, "/");
 				strcpy(newest_dir, rdir_Struct->d_name);
-				// printf("largest: %s\n", newest_dir);
-			}
-			
+			}			
 		}
 	}
 
@@ -77,6 +94,15 @@ int main(){
 
 	char* directory = last_dir();
 	printf("name: %s\n", directory);
+
+	char names[7][14];
+
+	getFileNames(directory, names);
+	
+	int i;
+	for(i = 0; i < 7; i++){
+		printf("%s\n", names[i]);
+	}
 
 	free(directory);
 
