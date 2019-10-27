@@ -6,23 +6,46 @@
 #include <unistd.h>
 #include <dirent.h>
 
-void last_dir(){
-	struct dirent *rStruct;
-	struct stat sStruct;
+char* last_dir(){
+	struct dirent *rdir_Struct;
+	struct stat stat_Struct;
 	DIR *directory = opendir(".");
+	char* newest_dir = malloc(25 * sizeof(char));
 
-	while(rStruct = readdir(directory)){
-		stat(rStruct->d_name, &sStruct);
-		int isDirectory = S_ISDIR(sStruct.st_mode);
+	int largest = 0;
+	int time;
+	char name[25];
+
+	/* The current directory, "." will always be last modified,
+	 * so doing the command below will look at that directory
+	 * first and basically start the rdir_Struct past the current
+	 * directory. */
+	rdir_Struct = readdir(directory);
+
+
+	while(rdir_Struct = readdir(directory)){
+		stat(rdir_Struct->d_name, &stat_Struct);
+		int isDirectory = S_ISDIR(stat_Struct.st_mode);
 
 		if(isDirectory){
-			printf("Name: %s\n", rStruct->d_name);
-			printf("Time: %d\n", sStruct.st_mtime);
+			strcpy(name, rdir_Struct->d_name);
+			time = stat_Struct.st_mtime;
+
+			printf("Name: %s\n", name);
+			printf("Time: %d\n", time);
 			printf("\n");
+
+			if(time > largest){
+				largest = stat_Struct.st_mtime;
+				strcpy(newest_dir, rdir_Struct->d_name);
+				printf("largest: %s\n", newest_dir);
+			}
+			
 		}
 	}
 
 	closedir(directory);
+	return newest_dir;
 }
 
 int main(){
@@ -52,7 +75,10 @@ int main(){
 
 	// closedir(direc);
 
-	last_dir();
+	char* directory = last_dir();
+	printf("name: %s\n", directory);
+
+	free(directory);
 
 	return 0;
 }
