@@ -154,7 +154,7 @@ char* last_dir(){
 
 void startGame(struct room* array){
 	do{
-		printf("CURRENT LOCATION: %s\n", );
+		// printf("CURRENT LOCATION: %s\n", );
 	}
 }
 
