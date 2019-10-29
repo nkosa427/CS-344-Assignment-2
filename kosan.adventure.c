@@ -93,15 +93,7 @@ void readFiles(char paths[7][33], struct room* array, int i){
 
 	getRoomType(array, i, file, filepos);
 
-	// printf("Room Name: %s\n", array[i].name);
-	// printf("Num connections: %d\n", array[i].cons);
-
-	// for(j = 0; j < array[i].cons; j++){
-	// 	printf("Connection: %s\n", array[i].connections[j]);
-	// }
-		
-	// printf("Type: %s\n", array[i].type);
-
+	fclose(file);
 }
 
 void getPaths(char* dir, char names[7][33]){
@@ -157,10 +149,13 @@ char* last_dir(){
 	}
 
 	closedir(directory);
-
-	printf("Address in last_dir: %p\n", newest_dir);
-
 	return newest_dir;
+}
+
+void startGame(struct room* array){
+	do{
+		printf("CURRENT LOCATION: %s\n", );
+	}
 }
 
 int main(){
@@ -170,7 +165,7 @@ int main(){
 	array = (struct room*) malloc(7 * sizeof(struct room));
 
 	char* directory = last_dir();
-	printf("name: %s\n", directory);
+	// printf("name: %s\n", directory);
 
 	char paths[7][33];
 	getPaths(directory, paths);
@@ -187,7 +182,7 @@ int main(){
 	// 	printf("ROOM TYPE: %s\n\n", array[i].type);
 	// }
 
-	printf("Address in main: %p\n", directory);
+	startGame(array);
 	
 	free(array);
 	free(directory);
