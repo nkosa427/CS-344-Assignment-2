@@ -40,8 +40,6 @@ int getCons(struct room* array, int i, FILE *file){
 	char name[9];
 	int chars, cons, index;
 
-	printf("%d\n", ftell(file));
-
 	fseek(file, 1, SEEK_CUR);
 	cons = 0;
 	do{
@@ -64,7 +62,7 @@ int getCons(struct room* array, int i, FILE *file){
 	return ftell(file);
 }
 
-int getName(struct room* array, int i, FILE *file){
+void getName(struct room* array, int i, FILE *file){
 	char c;
 	char name[9];
 	memset(name, '\0', 9);
@@ -82,42 +80,31 @@ int getName(struct room* array, int i, FILE *file){
 	}while(c != 10);
 
 	strcpy(array[i].name, name);
-	return(ftell(file));
 }
 
 void readFiles(char paths[7][33], struct room* array, int i){
-	FILE *file = fopen(paths[0], "r");
-	int filepos;
-	printf("path: %s\n", paths[0]);
+	FILE *file = fopen(paths[i], "r");
+	int filepos, j;
+	// printf("path: %s\n", paths[i]);
 
-	i = 0;
-
-	filepos = getName(array, i, file);
-	printf("filepos: %d\n", filepos);
+	getName(array, i, file);
+	// printf("filepos: %d\n", filepos);
 	filepos = getCons(array, i, file);
 
 	getRoomType(array, i, file, filepos);
 
-	printf("Room Name: %s\n", array[0].name);
-	// printf("Connection: %s\n", array[0].connections[0]);
-	printf("Num connections: %d\n", array[0].cons);
+	// printf("Room Name: %s\n", array[i].name);
+	// printf("Num connections: %d\n", array[i].cons);
 
-	for(i = 0; i < array[0].cons; i++){
-		printf("Connection: %s\n", array[0].connections[i]);
-	}
-		
-	printf("Type: %s\n", array[0].type);
-
-	// while(feof(file) == 0){
-	// 	c = fgetc(file);
-	// 	printf("%c", c);
-	// 	if(c == 10){
-	// 		printf("NEWLINE\n");
-	// 	}
+	// for(j = 0; j < array[i].cons; j++){
+	// 	printf("Connection: %s\n", array[i].connections[j]);
 	// }
+		
+	// printf("Type: %s\n", array[i].type);
+
 }
 
-void getFileNames(char* dir, char names[7][33]){
+void getPaths(char* dir, char names[7][33]){
 	struct dirent *rdir_Struct;
 	DIR *directory = opendir(dir);
 	
@@ -162,23 +149,22 @@ char* last_dir(){
 			strcpy(name, rdir_Struct->d_name);
 			time = stat_Struct.st_mtime;
 
-			// printf("Name: %s\n", name);
-			// printf("Time: %d\n", time);
-			// printf("\n");
-
 			if(time > largest){
 				largest = stat_Struct.st_mtime;
-				// strcpy(newest_dir, "/");
 				strcpy(newest_dir, rdir_Struct->d_name);
 			}			
 		}
 	}
 
 	closedir(directory);
+
+	printf("Address in last_dir: %p\n", newest_dir);
+
 	return newest_dir;
 }
 
 int main(){
+	int i, j;
 
 	struct room *array;
 	array = (struct room*) malloc(7 * sizeof(struct room));
@@ -187,15 +173,23 @@ int main(){
 	printf("name: %s\n", directory);
 
 	char paths[7][33];
-	getFileNames(directory, paths);
+	getPaths(directory, paths);
 
-	readFiles(paths, array);
-	
-	// int i;
+	for(i = 0; i < 7; i++){
+		readFiles(paths, array, i);
+	}
+
 	// for(i = 0; i < 7; i++){
-	// 	printf("%s\n", names[i]);
+	// 	printf("ROOM NAME: %s\n", array[i].name);
+	// 	for(j = 0; j < array[i].cons; j++){
+	// 		printf("CONNECTION %d: %s\n", j+1, array[i].connections[j]);
+	// 	}
+	// 	printf("ROOM TYPE: %s\n\n", array[i].type);
 	// }
 
+	printf("Address in main: %p\n", directory);
+	
+	free(array);
 	free(directory);
 
 	return 0;
