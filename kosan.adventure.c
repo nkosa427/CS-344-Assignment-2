@@ -6,7 +6,47 @@
 #include <unistd.h>
 #include <dirent.h>
 
-void getFileNames(char* dir, char names[7][14]){
+struct room{
+	char name[9];
+	char type[11];
+	int cons;
+	int connections[7];
+};
+
+void readFiles(char names[7][33], struct room* array){
+	FILE *file = fopen(names[0], "r");
+	char c;
+	char name[9];
+	int count;
+
+	fseek(file, 11, SEEK_SET);	//Sets cursor to right at name
+
+	count = 0;
+	memset(name, '\0', 9);
+	do{
+		c = fgetc(file);
+		if(c != 10){
+			name[count] = c;
+			count++;
+		}
+	}while(c != 10);
+
+	printf("%s\n", name);
+
+	if(strcmp(name, "OSU") == 0){
+		printf("success\n");
+	}
+
+	// while(feof(file) == 0){
+	// 	c = fgetc(file);
+	// 	printf("%c", c);
+	// 	if(c == 10){
+	// 		printf("NEWLINE\n");
+	// 	}
+	// }
+}
+
+void getFileNames(char* dir, char names[7][33]){
 	struct dirent *rdir_Struct;
 	DIR *directory = opendir(dir);
 	
@@ -17,7 +57,9 @@ void getFileNames(char* dir, char names[7][14]){
 
 	while(rdir_Struct = readdir(directory)){
 		// printf("%s\n", rdir_Struct->d_name);
-		strcpy(names[i], rdir_Struct->d_name);
+		strcpy(names[i], dir);
+		strcat(names[i], "/");
+		strcat(names[i], rdir_Struct->d_name);
 		i++;
 	}
 
@@ -92,17 +134,21 @@ int main(){
 
 	// closedir(direc);
 
+	struct room *array;
+	array = (struct room*) malloc(7 * sizeof(struct room));
+
 	char* directory = last_dir();
 	printf("name: %s\n", directory);
 
-	char names[7][14];
+	char paths[7][33];
+	getFileNames(directory, paths);
 
-	getFileNames(directory, names);
+	readFiles(paths, array);
 	
-	int i;
-	for(i = 0; i < 7; i++){
-		printf("%s\n", names[i]);
-	}
+	// int i;
+	// for(i = 0; i < 7; i++){
+	// 	printf("%s\n", names[i]);
+	// }
 
 	free(directory);
 
