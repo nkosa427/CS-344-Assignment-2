@@ -10,24 +10,69 @@ struct room{
 	char name[9];
 	char type[11];
 	int cons;
-	int connections[7];
+	char connections[7][9];
 };
 
-void getCons(struct room* array, int i, FILE *file){
+void getRoomType(struct room* array, int i, FILE *file, int pos){
 	char c;
-	char name[9];
-	printf("%d\n", ftell(file));
+	char type[11];
+	int chars;
+
+	fseek(file, pos, SEEK_SET);	//Sets file pos to where if left off
+	fseek(file, 10, SEEK_CUR);	//Moves file position to room type
+
+	memset(type, '\0', 11);
+
+	chars = 0;
+	do{
+		c = fgetc(file);
+		if(c != 10){
+			type[chars] = c;
+			chars++;
+		}
+	}while(c != 10);
+
+	strcpy(array[i].type, type);
 }
 
-void getName(struct room* array, int i, FILE *file){
+int getCons(struct room* array, int i, FILE *file){
 	char c;
 	char name[9];
+	int chars, cons, index;
+
+	printf("%d\n", ftell(file));
+
+	fseek(file, 1, SEEK_CUR);
+	cons = 0;
+	do{
+		memset(name, '\0', 9);	//Clears name string
+		fseek(file, 13, SEEK_CUR);	//Start of connection name
+		chars = 0;
+		do{
+			c = fgetc(file);
+			if(c != 10){			//If next character is not newline
+				name[chars] = c;
+				chars++;
+			}
+		}while(c != 10);
+		strcpy(array[i].connections[cons], name);
+		c = fgetc(file);	//Checks first character of line
+		cons++;
+	}while(c != 82);		//If next character is not 'R'
+
+	array[i].cons = cons;
+	return ftell(file);
+}
+
+int getName(struct room* array, int i, FILE *file){
+	char c;
+	char name[9];
+	memset(name, '\0', 9);
 	int count;
 
 	fseek(file, 11, SEEK_SET);	//Sets cursor to right at name
 
 	count = 0;
-	memset(name, '\0', 9);
 	do{
 		c = fgetc(file);
 		if(c != 10){
@@ -37,17 +82,31 @@ void getName(struct room* array, int i, FILE *file){
 	}while(c != 10);
 
 	strcpy(array[i].name, name);
+	return(ftell(file));
 }
 
-void readFiles(char paths[7][33], struct room* array){
+void readFiles(char paths[7][33], struct room* array, int i){
 	FILE *file = fopen(paths[0], "r");
+	int filepos;
 	printf("path: %s\n", paths[0]);
 
-	getName(array, 0, file);
-	getCons(array, 0, file);
+	i = 0;
 
-	printf("%s\n", array[0].name);
-	
+	filepos = getName(array, i, file);
+	printf("filepos: %d\n", filepos);
+	filepos = getCons(array, i, file);
+
+	getRoomType(array, i, file, filepos);
+
+	printf("Room Name: %s\n", array[0].name);
+	// printf("Connection: %s\n", array[0].connections[0]);
+	printf("Num connections: %d\n", array[0].cons);
+
+	for(i = 0; i < array[0].cons; i++){
+		printf("Connection: %s\n", array[0].connections[i]);
+	}
+		
+	printf("Type: %s\n", array[0].type);
 
 	// while(feof(file) == 0){
 	// 	c = fgetc(file);
@@ -120,31 +179,6 @@ char* last_dir(){
 }
 
 int main(){
-
-	// struct stat s;
-
-	// // int is = stat(".", &s);
-	// // printf("%d\n", is);
-	// // printf("%d\n", s.st_mode);
-
-	// struct dirent *d;
-	// DIR *direc = opendir(".");
-
-	// // while((d = readdir(direc)) != NULL){
-	// // 	printf("%s\n", d->d_name);
-	// // 	printf("%d\n", d->d_ino);
-	// // 	printf("%c\n", d->d_type);
-	// // 	printf("\n");
-	// // }
-
-	// while(d = readdir(direc)){
-	// 	stat(d->d_name &s);
-	// 	printf("%d\n", S_ISDIR(s.st_mode));
-	// 	printf("%s\n", d->d_name);
-	// 	printf("\n");
-	// }
-
-	// closedir(direc);
 
 	struct room *array;
 	array = (struct room*) malloc(7 * sizeof(struct room));
