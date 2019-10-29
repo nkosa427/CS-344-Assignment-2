@@ -13,8 +13,13 @@ struct room{
 	int connections[7];
 };
 
-void readFiles(char names[7][33], struct room* array){
-	FILE *file = fopen(names[0], "r");
+void getCons(struct room* array, int i, FILE *file){
+	char c;
+	char name[9];
+	printf("%d\n", ftell(file));
+}
+
+void getName(struct room* array, int i, FILE *file){
 	char c;
 	char name[9];
 	int count;
@@ -31,11 +36,18 @@ void readFiles(char names[7][33], struct room* array){
 		}
 	}while(c != 10);
 
-	printf("%s\n", name);
+	strcpy(array[i].name, name);
+}
 
-	if(strcmp(name, "OSU") == 0){
-		printf("success\n");
-	}
+void readFiles(char paths[7][33], struct room* array){
+	FILE *file = fopen(paths[0], "r");
+	printf("path: %s\n", paths[0]);
+
+	getName(array, 0, file);
+	getCons(array, 0, file);
+
+	printf("%s\n", array[0].name);
+	
 
 	// while(feof(file) == 0){
 	// 	c = fgetc(file);
