@@ -173,17 +173,18 @@ void *writeTime(void *arg){
 	char *directory = (char*)arg;
 	strcat(directory, "/currentTime.txt");
 
-	int file_descriptor = open(directory, O_WRONLY | O_CREAT, 0600);
-	// printf("%s\n", directory);
-	// FILE *file;
-	// file = fopen(directory, "w+");
+	// int file_descriptor = open(directory, O_WRONLY | O_CREAT, 5755);
+	printf("%s\n", directory);
+	FILE *file;
+	file = fopen(directory, "w+");
 
 
 	t = time(NULL);
 	timeStruct = localtime(&t);
 
 	strftime(str, sizeof(str), "%I:%M%P, %A, %B %d, %Y", timeStruct);
-	int wr = write(file_descriptor, str, strlen(str) * sizeof(char));
+	// int wr = write(file_descriptor, str, strlen(str) * sizeof(char));
+	fprintf(file, "%s\n", str);
 
 	return NULL;
 }
