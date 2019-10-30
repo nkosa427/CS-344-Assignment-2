@@ -152,10 +152,80 @@ char* last_dir(){
 	return newest_dir;
 }
 
-void startGame(struct room* array){
-	do{
-		// printf("CURRENT LOCATION: %s\n", );
+//////////////////////////////////////////////////////
+
+int getNext(struct room* array, char* str){
+	int i;
+	for(i = 0; i < 7; i++){
+		if(strcmp(array[i].name, str) == 0){
+			return i;
+		}
 	}
+
+}
+
+int validConnection(struct room* array, int cur, char* str){
+	int i;
+	for(i = 0; i < array[cur].cons; i++){
+		if(strcmp(array[cur].connections[i], str) == 0){
+			return i;
+		}
+	}
+
+	printf("\nHUH? I DIDN'T UNDERSTAND THAT ROOM. TRY AGAIN.\n\n");
+	return -1;
+}
+
+void printCurrent(struct room* array, int cur){
+	int i;
+	printf("CURRENT LOCATION: %s\n", array[cur].name);
+	printf("POSSIBLE CONNECTIONS: ");
+	for(i = 0; i < array[cur].cons; i++){
+		if(i == (array[cur].cons - 1)){
+			printf("%s.\n", array[cur].connections[i]);
+		}else{
+			printf("%s, ", array[cur].connections[i]);
+		}
+	}
+	printf("WHERE TO? >");
+}
+
+int getInput(struct room* array, int cur, char* str){
+	int dest;
+	do{
+		printCurrent(array, cur);
+		memset(str, '\0', 50);
+		fgets(str, 50, stdin);
+		str[strlen(str) - 1] = '\0';	//removes newline char
+		dest = validConnection(array, cur, str);
+	}while(dest == -1);
+
+	return dest;
+}
+
+int getStartIndex(struct room* array){
+	int i;
+	for(i = 0; i < 7; i++){
+		if(strcmp(array[i].type, "START_ROOM") == 0){
+			return i;
+		}
+	}
+	return 0;
+}
+
+void Game(struct room* array){
+	int cur = getStartIndex(array);
+	int dest;
+	int count = 0;
+	char *str = malloc(50 * sizeof(char));
+	// do{
+		dest = getInput(array, cur, str);
+		dest = getNext(array, str);
+		count++;
+		printf("goto: %s\n", array[dest].name);
+	// }while()
+
+	free(str);
 }
 
 int main(){
@@ -182,7 +252,7 @@ int main(){
 	// 	printf("ROOM TYPE: %s\n\n", array[i].type);
 	// }
 
-	startGame(array);
+	Game(array);
 	
 	free(array);
 	free(directory);
