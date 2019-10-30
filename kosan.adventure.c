@@ -165,19 +165,39 @@ char* last_dir(){
 
 //////////////////////////////////////////////////////
 
+void readTime(char* directory){
+	char curTime[40];
+	char c;
+	int count = 0;
+	memset(curTime, '\0', 40);
+
+	FILE *file;
+	file = fopen(directory, "r");
+
+	do{
+		c = fgetc(file);
+		if(c != 10){
+			curTime[count] = c;
+			count++;
+		}		
+	}while(c != 10);
+
+	printf("\n%s\n", curTime);
+	fclose(file);
+
+}
+
 void *writeTime(void *arg){
 	time_t t;
 	char str[50];
 	struct tm *timeStruct;
 
 	char *directory = (char*)arg;
-	strcat(directory, "/currentTime.txt");
 
 	// int file_descriptor = open(directory, O_WRONLY | O_CREAT, 5755);
-	printf("%s\n", directory);
+	// printf("%s\n", directory);
 	FILE *file;
 	file = fopen(directory, "w+");
-
 
 	t = time(NULL);
 	timeStruct = localtime(&t);
@@ -185,6 +205,7 @@ void *writeTime(void *arg){
 	strftime(str, sizeof(str), "%I:%M%P, %A, %B %d, %Y", timeStruct);
 	// int wr = write(file_descriptor, str, strlen(str) * sizeof(char));
 	fprintf(file, "%s\n", str);
+	fclose(file);
 
 	return NULL;
 }
@@ -251,14 +272,21 @@ void printCurrent(struct room* array, int cur){
 	printf("WHERE TO? >");
 }
 
-void getInput(struct room* array, int cur, char* str){
+void getInput(struct room* array, int cur, char* str, char* directory, pthread_t thread){
 	int dest;
 	do{
 		printCurrent(array, cur);
 		memset(str, '\0', 50);		//clears str since it's used a lot
 		fgets(str, 50, stdin);
 		str[strlen(str) - 1] = '\0';	//removes newline char
-		dest = validConnection(array, cur, str);	//TODO: Add time stuff.
+		if(strcmp(str, "time") == 0){
+			// pthread_create(&thread, NULL, writeTime, directory);
+			// readTime(directory);
+			dest = -1;
+		}else{
+			dest = validConnection(array, cur, str);
+		}
+		
 	}while(dest == -1);
 
 }
@@ -273,7 +301,7 @@ int getStartIndex(struct room* array){
 	return 0;
 }
 
-void Game(struct room* array, char* directory){
+void Game(struct room* array, char* directory, pthread_t thread){
 	int cur = getStartIndex(array);
 	int dest, i;
 	int count = 0;
@@ -286,7 +314,7 @@ void Game(struct room* array, char* directory){
 	history->capacity = 3;
 
 	do{
-		getInput(array, cur, str);
+		getInput(array, cur, str, directory, thread);
 		cur = getNext(array, str);
 		count++;
 		addPath(history, cur, count);
@@ -309,7 +337,7 @@ int main(){
 	int i, j;
 
 	pthread_t thread;
-	pthread_mutex_lock(&lock);
+	// pthread_mutex_lock(&lock);
 
 	struct room *array;
 	array = (struct room*) malloc(7 * sizeof(struct room));
@@ -323,8 +351,9 @@ int main(){
 		readFiles(paths, array, i);
 	}
 
-	// Game(array, directory);
-	writeTime(directory);
+	strcat(directory, "/currentTime.txt");	//Adds path for time function
+	Game(array, directory, thread);
+	// writeTime(directory);
 	
 	free(array);
 	free(directory);
