@@ -5,6 +5,11 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <dirent.h>
+#include <time.h>
+#include <pthread.h>
+#include <fcntl.h>
+
+pthread_mutex_t lock;
 
 struct room{
 	char name[9];
@@ -27,12 +32,12 @@ void getRoomType(struct room* array, int i, FILE *file, int pos){
 	fseek(file, pos, SEEK_SET);	//Sets file pos to where if left off
 	fseek(file, 10, SEEK_CUR);	//Moves file position to room type
 
-	memset(type, '\0', 11);
+	memset(type, '\0', 11);		//clears this since it's used a lot
 
 	chars = 0;
 	do{
 		c = fgetc(file);
-		if(c != 10){
+		if(c != 10){						//if next char is newline
 			type[chars] = c;
 			chars++;
 		}
@@ -56,7 +61,7 @@ int getCons(struct room* array, int i, FILE *file){
 			c = fgetc(file);
 			if(c != 10){			//If next character is not newline
 				name[chars] = c;
-				chars++;
+				chars++;				//Increments place in char array
 			}
 		}while(c != 10);
 		strcpy(array[i].connections[cons], name);
@@ -160,16 +165,41 @@ char* last_dir(){
 
 //////////////////////////////////////////////////////
 
+void *writeTime(void *arg){
+	time_t t;
+	char str[50];
+	struct tm *timeStruct;
+
+	char *directory = (char*)arg;
+	strcat(directory, "/currentTime.txt");
+
+	int file_descriptor = open(directory, O_WRONLY | O_CREAT, 0600);
+	// printf("%s\n", directory);
+	// FILE *file;
+	// file = fopen(directory, "w+");
+
+
+	t = time(NULL);
+	timeStruct = localtime(&t);
+
+	strftime(str, sizeof(str), "%I:%M%P, %A, %B %d, %Y", timeStruct);
+	int wr = write(file_descriptor, str, strlen(str) * sizeof(char));
+
+	return NULL;
+}
+
+//////////////////////////////////////////////////////
+
 void resizeArray(struct dynArray *history){
 	// printf("resizing\n");
 	history->capacity = history->capacity * 2;
 	int *newArr = malloc(history->capacity * sizeof(int));
 	int i;
 	for(i = 0; i < history->size; i++){
-		newArr[i] = history->arr[i];
+		newArr[i] = history->arr[i];	//copies stuff over
 	}
-	free(history->arr);
-	history->arr = newArr;
+	free(history->arr);		//frees memory from old array
+	history->arr = newArr;	//points to new array
 }
 
 void addPath(struct dynArray *history, int cur, int count){
@@ -181,13 +211,13 @@ void addPath(struct dynArray *history, int cur, int count){
 	}
 	history->arr[history->size] = cur;
 	history->size += 1;
-	printf("added: %d\n", history->arr[history->size-1]);
+	// printf("added: %d\n", history->arr[history->size-1]);
 }
 
 int getNext(struct room* array, char* str){
 	int i;
 	for(i = 0; i < 7; i++){
-		if(strcmp(array[i].name, str) == 0){
+		if(strcmp(array[i].name, str) == 0){		//gets index of next room
 			return i;
 		}
 	}
@@ -224,7 +254,7 @@ void getInput(struct room* array, int cur, char* str){
 	int dest;
 	do{
 		printCurrent(array, cur);
-		memset(str, '\0', 50);
+		memset(str, '\0', 50);		//clears str since it's used a lot
 		fgets(str, 50, stdin);
 		str[strlen(str) - 1] = '\0';	//removes newline char
 		dest = validConnection(array, cur, str);	//TODO: Add time stuff.
@@ -242,7 +272,7 @@ int getStartIndex(struct room* array){
 	return 0;
 }
 
-void Game(struct room* array){
+void Game(struct room* array, char* directory){
 	int cur = getStartIndex(array);
 	int dest, i;
 	int count = 0;
@@ -277,11 +307,13 @@ void Game(struct room* array){
 int main(){
 	int i, j;
 
+	pthread_t thread;
+	pthread_mutex_lock(&lock);
+
 	struct room *array;
 	array = (struct room*) malloc(7 * sizeof(struct room));
 
 	char* directory = last_dir();
-	// printf("name: %s\n", directory);
 
 	char paths[7][33];
 	getPaths(directory, paths);
@@ -290,7 +322,8 @@ int main(){
 		readFiles(paths, array, i);
 	}
 
-	Game(array);
+	// Game(array, directory);
+	writeTime(directory);
 	
 	free(array);
 	free(directory);
