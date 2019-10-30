@@ -172,13 +172,13 @@ int validConnection(struct room* array, int cur, char* str){
 		}
 	}
 
-	printf("\nHUH? I DIDN'T UNDERSTAND THAT ROOM. TRY AGAIN.\n\n");
+	printf("\nHUH? I DIDN'T UNDERSTAND THAT ROOM. TRY AGAIN.\n");
 	return -1;
 }
 
 void printCurrent(struct room* array, int cur){
 	int i;
-	printf("CURRENT LOCATION: %s\n", array[cur].name);
+	printf("\nCURRENT LOCATION: %s\n", array[cur].name);
 	printf("POSSIBLE CONNECTIONS: ");
 	for(i = 0; i < array[cur].cons; i++){
 		if(i == (array[cur].cons - 1)){
@@ -190,7 +190,7 @@ void printCurrent(struct room* array, int cur){
 	printf("WHERE TO? >");
 }
 
-int getInput(struct room* array, int cur, char* str){
+void getInput(struct room* array, int cur, char* str){
 	int dest;
 	do{
 		printCurrent(array, cur);
@@ -200,7 +200,6 @@ int getInput(struct room* array, int cur, char* str){
 		dest = validConnection(array, cur, str);
 	}while(dest == -1);
 
-	return dest;
 }
 
 int getStartIndex(struct room* array){
@@ -218,12 +217,15 @@ void Game(struct room* array){
 	int dest;
 	int count = 0;
 	char *str = malloc(50 * sizeof(char));
-	// do{
-		dest = getInput(array, cur, str);
-		dest = getNext(array, str);
+
+	do{
+		getInput(array, cur, str);
+		cur = getNext(array, str);
 		count++;
-		printf("goto: %s\n", array[dest].name);
-	// }while()
+	}while(strcmp(array[cur].type, "END_ROOM") != 0);
+
+	printf("CONGRATS! YOU'VE REACHED THE END!\n");
+	printf("YOU TOOK %d STEPS.\n", count);
 
 	free(str);
 }
