@@ -146,7 +146,7 @@ int main()
 
 	create_rooms(array, namearray);
 
-	print_rooms(array);
+	// print_rooms(array);
 
 	mkdir(foldername, 0700);
 

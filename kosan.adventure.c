@@ -227,7 +227,7 @@ void getInput(struct room* array, int cur, char* str){
 		memset(str, '\0', 50);
 		fgets(str, 50, stdin);
 		str[strlen(str) - 1] = '\0';	//removes newline char
-		dest = validConnection(array, cur, str);
+		dest = validConnection(array, cur, str);	//TODO: Add time stuff.
 	}while(dest == -1);
 
 }
@@ -289,14 +289,6 @@ int main(){
 	for(i = 0; i < 7; i++){
 		readFiles(paths, array, i);
 	}
-
-	// for(i = 0; i < 7; i++){
-	// 	printf("ROOM NAME: %s\n", array[i].name);
-	// 	for(j = 0; j < array[i].cons; j++){
-	// 		printf("CONNECTION %d: %s\n", j+1, array[i].connections[j]);
-	// 	}
-	// 	printf("ROOM TYPE: %s\n\n", array[i].type);
-	// }
 
 	Game(array);
 	
