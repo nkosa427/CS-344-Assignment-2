@@ -13,6 +13,12 @@ struct room{
 	char connections[7][9];
 };
 
+struct dynArray{
+	int *arr;
+	int size;
+	int capacity;
+};
+
 void getRoomType(struct room* array, int i, FILE *file, int pos){
 	char c;
 	char type[11];
@@ -154,6 +160,30 @@ char* last_dir(){
 
 //////////////////////////////////////////////////////
 
+void resizeArray(struct dynArray *history){
+	// printf("resizing\n");
+	history->capacity = history->capacity * 2;
+	int *newArr = malloc(history->capacity * sizeof(int));
+	int i;
+	for(i = 0; i < history->size; i++){
+		newArr[i] = history->arr[i];
+	}
+	free(history->arr);
+	history->arr = newArr;
+}
+
+void addPath(struct dynArray *history, int cur, int count){
+	// printf("size: %d\n", history->size);
+	// printf("capacity: %d\n", history->capacity);
+
+	if(history->size == history->capacity){
+		resizeArray(history);
+	}
+	history->arr[history->size] = cur;
+	history->size += 1;
+	printf("added: %d\n", history->arr[history->size-1]);
+}
+
 int getNext(struct room* array, char* str){
 	int i;
 	for(i = 0; i < 7; i++){
@@ -214,20 +244,34 @@ int getStartIndex(struct room* array){
 
 void Game(struct room* array){
 	int cur = getStartIndex(array);
-	int dest;
+	int dest, i;
 	int count = 0;
 	char *str = malloc(50 * sizeof(char));
+	
+	struct dynArray *history;
+	history = (struct dynArray*) malloc(sizeof(struct dynArray));
+	history->arr = malloc(3 * sizeof(int));
+	history->size = 0;
+	history->capacity = 3;
 
 	do{
 		getInput(array, cur, str);
 		cur = getNext(array, str);
 		count++;
+		addPath(history, cur, count);
 	}while(strcmp(array[cur].type, "END_ROOM") != 0);
 
 	printf("CONGRATS! YOU'VE REACHED THE END!\n");
 	printf("YOU TOOK %d STEPS.\n", count);
+	printf("YOUR PATH THROUGH:\n");
+
+	for(i = 0; i < history->size; i++){
+		printf("%s\n", array[history->arr[i]].name);
+	}
 
 	free(str);
+	free(history->arr);
+	free(history);
 }
 
 int main(){
