@@ -10,6 +10,7 @@
 #include <fcntl.h>
 
 pthread_mutex_t lock;
+pthread_t thread;
 
 struct room{
 	char name[9];
@@ -100,7 +101,7 @@ void readFiles(char paths[7][33], struct room* array, int i){
 
 	getName(array, i, file);
 	// printf("filepos: %d\n", filepos);
-	filepos = getCons(array, i, file);
+	filepos = getCons(array, i, file);	//tracks position of stream cursor thing
 
 	getRoomType(array, i, file, filepos);
 
@@ -127,15 +128,17 @@ void getPaths(char* dir, char names[7][33]){
 	closedir(directory);
 }
 
-char* last_dir(){
+void last_dir(char* newest_dir){
 	struct dirent *rdir_Struct;
 	struct stat stat_Struct;
 	DIR *directory = opendir(".");
-	char* newest_dir = malloc(25 * sizeof(char));
+	// char* newest_dir = malloc(30 * sizeof(char));
+
+	memset(newest_dir, '\0', 25);
 
 	int largest = 0;
 	int time;
-	char name[25];
+	char name[24];
 
 	/* The current directory, "." will always be last modified,
 	 * so doing the command below will look at that directory
@@ -144,35 +147,35 @@ char* last_dir(){
 	rdir_Struct = readdir(directory);
 
 
-	while(rdir_Struct = readdir(directory)){
-		stat(rdir_Struct->d_name, &stat_Struct);
+	while(rdir_Struct = readdir(directory)){	//while stuff still in directory
+		stat(rdir_Struct->d_name, &stat_Struct);	//gets stats
 		int isDirectory = S_ISDIR(stat_Struct.st_mode);
 
 		if(isDirectory){
-			strcpy(name, rdir_Struct->d_name);
-			time = stat_Struct.st_mtime;
+			strcpy(name, rdir_Struct->d_name);	//gets name of directory
+			time = stat_Struct.st_mtime;	//gets time modified
 
 			if(time > largest){
-				largest = stat_Struct.st_mtime;
+				largest = stat_Struct.st_mtime;	//tracks latest modified folder
 				strcpy(newest_dir, rdir_Struct->d_name);
 			}			
 		}
 	}
 
 	closedir(directory);
-	return newest_dir;
+	// return newest_dir;
 }
 
 //////////////////////////////////////////////////////
 
-void readTime(char* directory){
+void readTime(){
 	char curTime[40];
 	char c;
 	int count = 0;
 	memset(curTime, '\0', 40);
 
 	FILE *file;
-	file = fopen(directory, "r");
+	file = fopen("currentTime.txt", "r");
 
 	do{
 		c = fgetc(file);
@@ -180,7 +183,7 @@ void readTime(char* directory){
 			curTime[count] = c;
 			count++;
 		}		
-	}while(c != 10);
+	}while(c != 10);	//if next char not newline
 
 	printf("\n%s\n", curTime);
 	fclose(file);
@@ -188,16 +191,17 @@ void readTime(char* directory){
 }
 
 void *writeTime(void *arg){
+	pthread_mutex_lock(&lock);	//attempts lock. is run at very beginning of program
 	time_t t;
 	char str[50];
 	struct tm *timeStruct;
 
-	char *directory = (char*)arg;
+	// char *directory = (char*)arg;
 
 	// int file_descriptor = open(directory, O_WRONLY | O_CREAT, 5755);
 	// printf("%s\n", directory);
 	FILE *file;
-	file = fopen(directory, "w+");
+	file = fopen("./currentTime.txt", "w+");
 
 	t = time(NULL);
 	timeStruct = localtime(&t);
@@ -207,6 +211,8 @@ void *writeTime(void *arg){
 	fprintf(file, "%s\n", str);
 	fclose(file);
 
+	pthread_mutex_unlock(&lock); //unlocks mutex
+
 	return NULL;
 }
 
@@ -215,7 +221,7 @@ void *writeTime(void *arg){
 void resizeArray(struct dynArray *history){
 	// printf("resizing\n");
 	history->capacity = history->capacity * 2;
-	int *newArr = malloc(history->capacity * sizeof(int));
+	int *newArr = malloc(history->capacity * sizeof(int));	//allocates more memory
 	int i;
 	for(i = 0; i < history->size; i++){
 		newArr[i] = history->arr[i];	//copies stuff over
@@ -228,7 +234,7 @@ void addPath(struct dynArray *history, int cur, int count){
 	// printf("size: %d\n", history->size);
 	// printf("capacity: %d\n", history->capacity);
 
-	if(history->size == history->capacity){
+	if(history->size == history->capacity){		//checks if array needs to be bigger
 		resizeArray(history);
 	}
 	history->arr[history->size] = cur;
@@ -249,7 +255,7 @@ int getNext(struct room* array, char* str){
 int validConnection(struct room* array, int cur, char* str){
 	int i;
 	for(i = 0; i < array[cur].cons; i++){
-		if(strcmp(array[cur].connections[i], str) == 0){
+		if(strcmp(array[cur].connections[i], str) == 0){		//checks if connection exists
 			return i;
 		}
 	}
@@ -275,14 +281,17 @@ void printCurrent(struct room* array, int cur){
 void getInput(struct room* array, int cur, char* str, char* directory, pthread_t thread){
 	int dest;
 	do{
-		printCurrent(array, cur);
+		printCurrent(array, cur);	//prints current room, prompt, etc.
 		memset(str, '\0', 50);		//clears str since it's used a lot
-		fgets(str, 50, stdin);
+		fgets(str, 50, stdin);		//reads user input
 		str[strlen(str) - 1] = '\0';	//removes newline char
 		if(strcmp(str, "time") == 0){
-			// pthread_create(&thread, NULL, writeTime, directory);
-			// readTime(directory);
-			dest = -1;
+			pthread_mutex_unlock(&lock);	//Unlocks mutex to allow time function to run
+			pthread_join(thread, NULL);		//waits for it to finish
+			pthread_mutex_lock(&lock);		//Locks the mutex again
+			pthread_create(&thread, NULL, writeTime, NULL);	//Creates thread again. repeat process.
+			readTime(directory);		//this prints the current time from the file.
+			dest = -1;	//to reprompt user for location.
 		}else{
 			dest = validConnection(array, cur, str);
 		}
@@ -302,12 +311,12 @@ int getStartIndex(struct room* array){
 }
 
 void Game(struct room* array, char* directory, pthread_t thread){
-	int cur = getStartIndex(array);
+	int cur = getStartIndex(array);		//cur is current room user is in
 	int dest, i;
 	int count = 0;
 	char *str = malloc(50 * sizeof(char));
 	
-	struct dynArray *history;
+	struct dynArray *history;		//Made a dynamic array to store the user's path
 	history = (struct dynArray*) malloc(sizeof(struct dynArray));
 	history->arr = malloc(3 * sizeof(int));
 	history->size = 0;
@@ -315,9 +324,9 @@ void Game(struct room* array, char* directory, pthread_t thread){
 
 	do{
 		getInput(array, cur, str, directory, thread);
-		cur = getNext(array, str);
+		cur = getNext(array, str);		//cur is place the user wants to go
 		count++;
-		addPath(history, cur, count);
+		addPath(history, cur, count);	//Adds next place to array
 	}while(strcmp(array[cur].type, "END_ROOM") != 0);
 
 	printf("CONGRATS! YOU'VE REACHED THE END!\n");
@@ -336,13 +345,14 @@ void Game(struct room* array, char* directory, pthread_t thread){
 int main(){
 	int i, j;
 
-	pthread_t thread;
-	// pthread_mutex_lock(&lock);
+	pthread_mutex_lock(&lock);					//Locks the mutex from the beginning
+	pthread_create(&thread, NULL, writeTime, NULL);		//Creates the second thread which will try to also lock the mutex.
 
-	struct room *array;
-	array = (struct room*) malloc(7 * sizeof(struct room));
+	struct room *array;		
+	array = (struct room*) malloc(7 * sizeof(struct room));		//to recreate room struct from buildrooms program
 
-	char* directory = last_dir();
+	char* directory = malloc(100 * sizeof(char));		//holds path to recent directory
+	last_dir(directory);
 
 	char paths[7][33];
 	getPaths(directory, paths);
@@ -357,6 +367,7 @@ int main(){
 	
 	free(array);
 	free(directory);
+	pthread_mutex_destroy(&lock);
 
 	return 0;
 }
